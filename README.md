@@ -2,7 +2,8 @@
 
 ## Screenshot
 
-https://user-images.githubusercontent.com/36456160/189811218-d1acf622-63d0-45b8-9b28-d32cb938a08a.mp4
+![20221201124048_1](https://user-images.githubusercontent.com/36456160/205144772-bc832650-15e6-4304-9c65-fe7ce7f73e83.png)
+
 
 ## Installation
 For complete system config, please see https://github.com/taylor85345/hyprland-dotfiles
@@ -10,8 +11,8 @@ For complete system config, please see https://github.com/taylor85345/hyprland-d
 1. Install Hyprland and all Dependencies
 2. `mkdir ~/.config/hypr/themes`
 3. `cd ~/.config/hypr/themes`
-4. `git clone https://github.com/taylor85345/neon-hyprland-theme neon`
-5. Add `source=~/.config/hypr/themes/neon/theme.conf` to the end of your hyprland.conf
+4. `git clone https://github.com/taylor85345/cyber-hyprland-theme cyber`
+5. Add `source=~/.config/hypr/themes/cyber/theme.conf` to the end of your hyprland.conf
 
 ## Dependencies
 
