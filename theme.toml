@@ -1,0 +1,11 @@
+[theme]
+name = "Cyber"
+desc = "A cyberpunk theme with neon glow"
+version = "1.0"
+author = "BeardWarrior"
+git = "https://github.com/taylor85345/neon-hyprland-theme"
+config = "theme.conf"
+
+[kill]
+exclude_bar = ["eww"]
+exclude_wallpaper = ["swww"]
