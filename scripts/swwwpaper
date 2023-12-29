@@ -4,7 +4,7 @@ SWWW_TRANSITION=random
 export stills="$1"
 
 wallpaper () {
-    for monitor in "${monitors[@]}"; do swww img --outputs $monitor "$(randstill)"; done
+    for monitor in "${monitors[@]}"; do swww img --transition-type random --outputs $monitor "$(randstill)"; done
   }
 
 #Function to select a random file from $stills directory
