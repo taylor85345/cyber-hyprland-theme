@@ -1,7 +1,7 @@
 #! /bin/bash
 
 #define icons for workspaces 1-9
-ic=(0     輸  " " " " )
+ic=(0         )
 
 #initial check for occupied workspaces
 for num in $(hyprctl workspaces | grep ID | awk '{print $3}'); do 
