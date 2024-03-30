@@ -102,40 +102,42 @@ echo "
 
 echo '----- loading items -----'
 
-declare -a packages=("eww"
-		     "nerd-fonts-mononoki"
-		     "nerd-fonts-jetbrains-mono"
-		     "rofi-wayland"
-		     "dunst"
-		     "trayer"
-		     "swww"
-		     "macchina"
-		     "socat"
-		     "geticons"
-		    )
-declare -a aurs=("eww"
-		     "nerd-fonts-mononoki"
-		     "nerd-fonts-jetbrains-mono"
-		     "rofi-wayland"
-		     "dunst"
-		     "trayer"
-		     "swww"
-		     "macchina"
-		     "socat"
-		     "geticons"
-		    )
+declare -a packages=(
+    # "nerd-fonts-mononoki"
+    # "nerd-fonts-jetbrains-mono"
+    # "rofi-wayland"
+    "dunst"
+    "trayer"
+    # "swww"
+    # "macchina"
+    "socat"
+    # "geticons"
+)
+declare -a aurs=(
+    "eww"
+    # "nerd-fonts-mononoki"
+    # "nerd-fonts-jetbrains-mono"
+    # "rofi-wayland"
+    "dunst"
+    "trayer"
+    "swww"
+    "macchina"
+    "socat"
+    "geticons"
+)
 
-declare -a sources=("eww"
-		     "nerd-fonts-mononoki"
-		     "nerd-fonts-jetbrains-mono"
-		     "rofi-wayland"
-		     "dunst"
-		     "trayer"
-		     "swww"
-		     "macchina"
-		     "socat"
-		     "geticons"
-		    )
+declare -a sources=(
+    # "eww"
+    "nerd-fonts-mononoki"
+    "nerd-fonts-jetbrains-mono"
+    "rofi-wayland"
+    # "dunst"
+    # "trayer"
+    # "swww"
+    # "macchina"
+    # "socat"
+    # "geticons"
+)
 
 echo "-----=====----- installing from packages -----=====-----"
 for package in "${packages[@]}"
@@ -153,4 +155,13 @@ echo "-----=====----- installing from sources -----=====-----"
 for source in "${sources[@]}"
 do
     echo "----- installing $source -----"
+
+    if [ $package == 'eww' ]
+    then
+	echo '---found eww---'
+	echo '---installing rust---'
+	# curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh 
+
+    fi
+
 done
