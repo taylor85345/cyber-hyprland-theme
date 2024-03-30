@@ -140,26 +140,26 @@ declare -a sources=(
     # "geticons"
 )
 
-echo "-----=====----- installing from packages -----=====-----"
+echo "----- ----- installing from packages ----- -----"
 for package in "${packages[@]}"
 do
-    echo "----- installing $package ------"
+    echo "----- ----- ----- installing $package ----- ----- ------"
     echo "--- : sudo pacman -S $package"
     # sudo pacman -S $package
 done
 
-echo "-----=====----- installing from AURs -----=====-----"
+echo "----- ----- installing from AURs ----- -----"
 for aur in "${aurs[@]}"
 do
-    echo "----- installing $aur  -----"
+    echo "----- ----- ----- installing $aur ----- ----- -----"
     echo "--- : pacman -S $aur"
     # pacman -S $aur
 done
 
-echo "-----=====----- installing from sources -----=====-----"
+echo "----- ----- installing from sources ----- -----"
 for source in "${sources[@]}"
 do
-    echo "----- installing $source -----"
+    echo "----- ----- ----- installing $source ----- ----- -----"
 
     #--- eww is in aurs
     # if [ $package == 'eww' ]
@@ -183,20 +183,23 @@ do
 
     if [ $source == 'nerd-fonts-mononoki' ]
     then
-	echo '---found nerd-fonts-mononoki---'
+	echo '--- found nerd-fonts-mononoki ---'
+	echo '--- : yay -S ttf-mononoki'
 	# yay -S ttf-mononoki
     fi
 
     if [ $source == 'nerd-fonts-jetbrains-mono' ]
     then
-	echo '---found nerd-fonts-jetbrains-mono---'
+	echo '--- found nerd-fonts-jetbrains-mono ---'
+	echo '--- : yay -S ttf-jetbrains-mono-nerd'
 	# yay -S ttf-jetbrains-mono-nerd
     fi
 
     if [ $source == 'rofi-wayland' ]
     then
-	echo '---found rofi-wayland---'
-	# yay -S rofi-lbonn-wayland-git 
+	echo '--- found rofi-wayland ---'
+	echo '--- : yay -S rofi-lbonn-wayland-git'
+	# yay -S rofi-lbonn-wayland-git
     fi
 
 done
