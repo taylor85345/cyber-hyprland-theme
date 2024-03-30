@@ -103,6 +103,7 @@ echo "
 echo '----- loading items -----'
 
 declare -a packages=(
+    # "eww"
     # "nerd-fonts-mononoki"
     # "nerd-fonts-jetbrains-mono"
     # "rofi-wayland"
@@ -118,11 +119,11 @@ declare -a aurs=(
     # "nerd-fonts-mononoki"
     # "nerd-fonts-jetbrains-mono"
     # "rofi-wayland"
-    "dunst"
-    "trayer"
+    # "dunst"
+    # "trayer"
     "swww"
     "macchina"
-    "socat"
+    # "socat"
     "geticons"
 )
 
