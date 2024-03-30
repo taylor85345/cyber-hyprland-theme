@@ -137,20 +137,20 @@ declare -a sources=("eww"
 		     "geticons"
 		    )
 
-echo "----- installing from packages -----"
+echo "-----=====----- installing from packages -----=====-----"
 for package in "${packages[@]}"
 do
     echo "----- installing $package ------"
 done
 
-echo "----- installing from AURs -----"
+echo "-----=====----- installing from AURs -----=====-----"
 for aur in "${aurs[@]}"
 do
-    echo "----- installing $aur  ------"
+    echo "----- installing $aur  -----"
 done
 
-echo "----- installing from sources -----"
+echo "-----=====----- installing from sources -----=====-----"
 for source in "${sources[@]}"
 do
-    echo "----- installing $source ------"
+    echo "----- installing $source -----"
 done
