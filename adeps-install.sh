@@ -145,7 +145,7 @@ for package in "${packages[@]}"
 do
     echo "----- ----- ----- installing $package ----- ----- ------"
     echo "--- : sudo pacman -S $package"
-    # sudo pacman -S $package
+    sudo pacman -S $package
 done
 
 echo "----- ----- installing from AURs ----- -----"
@@ -153,7 +153,7 @@ for aur in "${aurs[@]}"
 do
     echo "----- ----- ----- installing $aur ----- ----- -----"
     echo "--- : pacman -S $aur"
-    # pacman -S $aur
+    pacman -S $aur
 done
 
 echo "----- ----- installing from sources ----- -----"
@@ -165,21 +165,21 @@ do
     then
 	echo '--- found nerd-fonts-mononoki ---'
 	echo '--- : yay -S ttf-mononoki'
-	# yay -S ttf-mononoki
+	yay -S ttf-mononoki
     fi
 
     if [ $source == 'nerd-fonts-jetbrains-mono' ]
     then
 	echo '--- found nerd-fonts-jetbrains-mono ---'
 	echo '--- : yay -S ttf-jetbrains-mono-nerd'
-	# yay -S ttf-jetbrains-mono-nerd
+	yay -S ttf-jetbrains-mono-nerd
     fi
 
     if [ $source == 'rofi-wayland' ]
     then
 	echo '--- found rofi-wayland ---'
 	echo '--- : yay -S rofi-lbonn-wayland-git'
-	# yay -S rofi-lbonn-wayland-git
+	yay -S rofi-lbonn-wayland-git
     fi
 
 done
