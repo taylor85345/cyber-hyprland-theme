@@ -162,8 +162,8 @@ do
 	echo '---found eww---'
 	echo '---installing rust---'
 	echo 'running curl to pull script from website from rustup: '
-	echo 'curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh '
 
+	echo 'curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh '
 	# curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh 
 
 	echo '---cloning repo: git clone https://github.com/elkowar/eww'
@@ -171,12 +171,15 @@ do
 
 	echo '---cd eww'
 	# cd eww
+
 	echo '--- : cargo build --release --no-default-features --features x11'
-	cargo build --release --no-default-features --features=wayland
+	# cargo build --release --no-default-features --features=wayland
+
 	echo '--- : cd target/release'
-	cd target/release
+	# cd target/release
+
 	echo '--- : chmod +x ./eww'
-	chmod +x ./eww
+	# chmod +x ./eww
     fi
 
 done
