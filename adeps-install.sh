@@ -157,29 +157,42 @@ for source in "${sources[@]}"
 do
     echo "----- installing $source -----"
 
-    if [ $package == 'eww' ]
+    #--- eww is in aurs
+    # if [ $package == 'eww' ]
+    # then
+    # 	echo '---found eww---'
+    # 	echo '---installing rust---'
+    # 	echo 'running curl to pull script from website from rustup: '
+    # 	echo 'curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh '
+    # 	# curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh 
+    # 	echo '---cloning repo: git clone https://github.com/elkowar/eww'
+    # 	# git clone https://github.com/elkowar/eww
+    # 	echo '---cd eww'
+    # 	# cd eww
+    # 	echo '--- : cargo build --release --no-default-features --features x11'
+    # 	# cargo build --release --no-default-features --features=wayland
+    # 	echo '--- : cd target/release'
+    # 	# cd target/release
+    # 	echo '--- : chmod +x ./eww'
+    # 	# chmod +x ./eww
+    # fi
+
+    if [ $source == 'nerd-fonts-mononoki' ]
     then
-	echo '---found eww---'
-	echo '---installing rust---'
-	echo 'running curl to pull script from website from rustup: '
+	echo '---found nerd-fonts-mononoki---'
+	# yay -S ttf-mononoki
+    fi
 
-	echo 'curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh '
-	# curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh 
+    if [ $source == 'nerd-fonts-jetbrains-mono' ]
+    then
+	echo '---found nerd-fonts-jetbrains-mono---'
+	# yay -S ttf-jetbrains-mono-nerd
+    fi
 
-	echo '---cloning repo: git clone https://github.com/elkowar/eww'
-	# git clone https://github.com/elkowar/eww
-
-	echo '---cd eww'
-	# cd eww
-
-	echo '--- : cargo build --release --no-default-features --features x11'
-	# cargo build --release --no-default-features --features=wayland
-
-	echo '--- : cd target/release'
-	# cd target/release
-
-	echo '--- : chmod +x ./eww'
-	# chmod +x ./eww
+    if [ $source == 'rofi-wayland' ]
+    then
+	echo '---found rofi-wayland---'
+	# yay -S rofi-lbonn-wayland-git 
     fi
 
 done
