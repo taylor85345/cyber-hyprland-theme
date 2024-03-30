@@ -144,12 +144,16 @@ echo "-----=====----- installing from packages -----=====-----"
 for package in "${packages[@]}"
 do
     echo "----- installing $package ------"
+    echo "--- : sudo pacman -S $package"
+    # sudo pacman -S $package
 done
 
 echo "-----=====----- installing from AURs -----=====-----"
 for aur in "${aurs[@]}"
 do
     echo "----- installing $aur  -----"
+    echo "--- : pacman -S $aur"
+    # pacman -S $aur
 done
 
 echo "-----=====----- installing from sources -----=====-----"
