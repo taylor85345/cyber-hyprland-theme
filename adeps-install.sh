@@ -99,6 +99,9 @@ echo "
 - [socat](http://www.dest-unreach.org/socat/) - Socket utility for eww workspace module
 - [geticons](https://git.sr.ht/~zethra/geticons) - CLI tool for locating icons
 "
+
+echo '----- loading items -----'
+
 declare -a packages=("eww"
 		     "nerd-fonts-mononoki"
 		     "nerd-fonts-jetbrains-mono"
@@ -134,26 +137,20 @@ declare -a sources=("eww"
 		     "geticons"
 		    )
 
-
 echo "----- installing from packages -----"
 for package in "${packages[@]}"
 do
     echo "----- installing $package ------"
-    
-done 
-
-
-echo "----- installing from AURs -----"
-for aur in "${aur[@]}"
-do
-    echo "----- installing $aur  ------"
-    
 done
 
+echo "----- installing from AURs -----"
+for aur in "${aurs[@]}"
+do
+    echo "----- installing $aur  ------"
+done
 
 echo "----- installing from sources -----"
-for source in "${source[@]}"
+for source in "${sources[@]}"
 do
     echo "----- installing $source ------"
-    
 done
