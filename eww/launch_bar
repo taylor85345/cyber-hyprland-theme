@@ -1,7 +1,11 @@
 #!/bin/bash
 
 ## Files and cmd
-EWW="eww -c $HOME/.config/hypr/themes/cyber/eww/"
+CONF_DIR="$HOME/.config/hypr/themes/cyber/eww"
+EWW="eww -c $CONF_DIR"
+
+## Refresh Weather Cache
+$CONF_DIR/scripts/weather --getdata &
 
 ## Run eww daemon if not running already
 if [[ ! $(pidof eww) ]]; then
