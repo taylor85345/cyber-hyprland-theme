@@ -1,7 +1,7 @@
 (defwindow notifications
     :geometry (geometry :x "0px"
                         :y "10px"
-                        :width "1px"
+                        :width "2px"
                         :height "93%"
                         :anchor "bottom right")
     :stacking "fg"

@@ -1,7 +1,7 @@
 (defwindow sidebar
     :geometry (geometry :x "0px"
                         :y "10px"
-                        :width "1px"
+                        :width "2px"
                         :height "93%"
                         :anchor "bottom left")
     :stacking "fg"
@@ -230,12 +230,12 @@
 	        :class "firmware" 
 	        :halign "center"  
 			:tooltip "Reboot to EFI" 
-	        :onclick "kitty systemctl reboot --firmware &" "拉")
+	        :onclick "kitty systemctl reboot --firmware &" "󰚗")
 	    (button 
 	        :class "exit" 
 	        :halign "center"  
 			:tooltip "Quit Hyprland" 
-	        :onclick "hyprctl dispatch exit exit" "")
+	        :onclick "hyprctl dispatch exit exit" "󰈆")
 	    (button 
 	        :class "restart" 
 	        :halign "center"  
