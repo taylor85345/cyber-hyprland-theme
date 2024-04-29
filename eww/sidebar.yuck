@@ -79,9 +79,9 @@
 			        :valign "center"
 			        :halign "center"
 			        :spacing 25
-			        (button :class "btn_prev" :onclick "scripts/music previous" "玲")
+			        (button :class "btn_prev" :onclick "scripts/music previous" "󰒮")
 			        (button :class "btn_play" :onclick "scripts/music toggle" playpause)
-			        (button :class "btn_next" :onclick "scripts/music next" "怜")))))
+			        (button :class "btn_next" :onclick "scripts/music next" "󰒭")))))
 
 (defpoll art		:interval "1s"  "scripts/music coverloc")
 (defpoll title		:interval "1s"  "scripts/music title")
