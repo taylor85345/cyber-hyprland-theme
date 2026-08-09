@@ -172,27 +172,27 @@ tooltip label {
 .works {
     font-size: 28px;
     font-weight: normal;
-    margin: 12px 10px 0px 10px;
+    margin: 12px 15px 0px 10px;
     background-color: rgba(00, 00, 00, 0.0);
 }
 
-.0 , .00, .01, .02, .03, .04, .05, .06, .07, .08, .09
-.000, .011, .022, .033, .044, .055, .066, .077, .088, .099 {
+.ws0 , .ws00, .ws01, .ws02, .ws03, .ws04, .ws05, .ws06, .ws07, .ws08, .ws09
+.ws0.ws0, .ws011, .ws022, .ws033, .ws044, .ws055, .ws066, .ws077, .ws088, .ws099 {
     margin: 0px 18px 0px 0px;
 }
 
 /* Unoccupied */
-.0 {
+.ws0 {
     color: $grey;
 }
 
 /* Occupied */
-.00, .01, .02, .03, .04, .05, .06, .07, .08, .09 {
+.ws00, .ws01, .ws02, .ws03, .ws04, .ws05, .ws06, .ws07, .ws08, .ws09 {
     color: $white;
 }
 
 /* Focused */
-.000, .011, .022, .033, .044, .055, .066, .077, .088, .099{
+.ws000, .ws011, .ws022, .ws033, .ws044, .ws055, .ws066, .ws077, .ws088, .ws099{
     color: $purple;
 }
 

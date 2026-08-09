@@ -1,71 +1,240 @@
-#! /bin/bash
+#!/usr/bin/env bash
 
-#set -euo pipefail
+# Optimized Wallpaper Manager for Hyprland
+# Switches between video and still wallpapers based on power status.
 
-#Check that variables were provided, or exit
-if [[ -d $1 && -d $2 ]]; then
-    export stills="$1"
-    export videos="$2"
-elif [[ $1 == '-h' ]] || [[ $1 == '--help' ]]; then
-    printf "Valid format is:\n" 
-    printf "./wallpaper <StillDirectory> <VideoDirectory>"
-    exit
+set -euo pipefail
+
+# --- Configuration ---
+STILLS_DIR=""
+VIDEOS_DIR=""
+LOCK_FILE="/tmp/hypr-wallpaper-manager.lock"
+
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+  --stills | -S)
+    STILLS_DIR="${2:-}"
+    shift 2
+    ;;
+  --videos | -V)
+    VIDEOS_DIR="${2:-}"
+    shift 2
+    ;;
+  --kill | -k)
+    if [[ -f "$LOCK_FILE" ]]; then
+      old_pid=$(cat "$LOCK_FILE" 2>/dev/null || echo "")
+      if [[ -n "$old_pid" ]] && kill -0 "$old_pid" 2>/dev/null; then
+        echo "Terminating wallpaper manager (PID: $old_pid)..."
+        kill -15 "$old_pid" || kill -9 "$old_pid"
+        exit 0
+      fi
+    fi
+    echo "No running instance found."
+    exit 0
+    ;;
+  *)
+    echo "Unknown option: $1"
+    show_help
+    exit 1
+    ;;
+  esac
+done
+
+# Determine Force Mode and validate directories
+if [[ -n "$STILLS_DIR" && -z "$VIDEOS_DIR" ]]; then
+  FORCE_MODE="stills"
+elif [[ -z "$STILLS_DIR" && -n "$VIDEOS_DIR" ]]; then
+  FORCE_MODE="videos"
+elif [[ -n "$STILLS_DIR" && -n "$VIDEOS_DIR" ]]; then
+  FORCE_MODE="auto"
 else
-    printf "Invalid Directory. Valid format is:\n" 
-    printf "./wallpaper <StillDirectory> <VideoDirectory>"
-    exit
+  echo "Error: You must specify at least one directory via --stills/-S or --videos/-V"
+  show_help
+  exit 1
 fi
 
-#Check for previous wallpaper processes and kill
-pgrep wallpaper | grep -wv $$ | xargs kill -3 2&> /dev/null || true
+if [[ -n "$STILLS_DIR" && ! -d "$STILLS_DIR" ]]; then
+  echo "Error: Still directory not found: '$STILLS_DIR'"
+  exit 1
+fi
 
-#Switches wallpaper based on charging status
-wptoggle () {
-    #Identify active monitors
-    monitors=($(hyprctl monitors | awk '{if ($1 ~ "Monitor") print $2}'))
+if [[ -n "$VIDEOS_DIR" && ! -d "$VIDEOS_DIR" ]]; then
+  echo "Error: Video directory not found: '$VIDEOS_DIR'"
+  exit 1
+fi
 
-    #Run appropriate  command based on charging state.
-    if [[ "$1" == "Discharging" ]] && [[ "$1" != "$laststate" ]]; then
-      hyprctl keyword decoration:blur_new_optimizations 1
-      pgrep swaybg || (for monitor in "${monitors[@]}"; do hyprctl dispatch exec "swaybg -m fill -o '$monitor' -i '$(randstill)'"; done)
-      [[ $laststate != "start" ]] && (sleep 5 && pkill -3 mpvpaper)
-    elif [[ "$1" != "$laststate" ]]; then
-      hyprctl keyword decoration:blur_new_optimizations 0
-      pgrep mpvpaper || (for monitor in "${monitors[@]}"; do mpvpaper -spf -n 1200 -o '--ao=null --reset-on-next-file=loop --loop-playlist --shuffle --panscan=1 --hwdec=auto input-ipc-server=/tmp/mpv-socket' "$monitor" "$videos"; done)
-      [[ $laststate != "start" ]] && (sleep 5 && pkill -3 swaybg)
-    fi
-    
-    export wpid=($(pgrep mpvpaper || pgrep swaybg))
+POLL_INTERVAL=10
+USER_ID=$(id -u)
+CLEANUP_SIGNAL=3 # User original script used -3 (SIGQUIT)
 
-    #Test for for active wallpaper process, or trigger re-launch on next execution
-    if [[ "${#wpid[@]}" == "${#monitors[@]}" ]]; then
-        export laststate=$1
-    else
-        cleanup
-        export laststate="start"
-    fi
-  }
+# --- Functions ---
 
-#Function to select a random file from $stills directory
-randstill() {
-    find "$stills" -maxdepth 1 -type f | shuf -n 1
+# Print help message
+show_help() {
+  cat <<EOF
+Usage: $(basename "$0") [options]
+
+Options:
+  -S, --stills <DIR>    Directory for still wallpapers
+  -V, --videos <DIR>    Directory for video wallpapers
+  -k, --kill            Kill the running instance
+
+Behavior:
+  - If only --stills is provided: Forces still wallpapers.
+  - If only --videos is provided: Forces video wallpapers.
+  - If both are provided: Switches dynamically based on power status.
+
+Dependencies: jq, upower, mpvpaper, awww, hyprctl
+EOF
 }
 
-#Kill forked wallpaper processes
-cleanup() {
-    for pid in "${wpid[@]}"; do
-        kill -3 "$pid"
+# Select a random still image from the directory
+get_random_still() {
+  find "$STILLS_DIR" -maxdepth 1 -type f \( -iname "*.jpg" -o -iname "*.jpeg" -o -iname "*.png" -o -iname "*.webp" \) | shuf -n 1
+}
+
+# Get list of active monitors using jq for robustness
+get_monitors() {
+  hyprctl monitors -j | jq -r '.[] | .name'
+}
+
+# Get current power status (charging/discharging)
+get_power_status() {
+  local bat
+  bat=$(upower -e | grep 'BAT' | head -n 1)
+  if [[ -z "$bat" ]]; then
+    echo "charging"
+    return
+  fi
+  # Normalize to lowercase charging/discharging/full
+  upower -i "$bat" | grep "state" | awk '{print tolower($2)}'
+}
+
+# Kill existing wallpaper processes gracefully
+stop_wallpapers() {
+  pkill -u "$USER_ID" -"$CLEANUP_SIGNAL" mpvpaper || true
+  pkill -u "$USER_ID" -"$CLEANUP_SIGNAL" awww-daemon || true
+}
+
+# Apply wallpaper based on state
+apply_wallpaper() {
+  local state="$1"
+  local monitors
+  mapfile -t monitors < <(get_monitors)
+
+  if [[ ${#monitors[@]} -eq 0 ]]; then
+    echo "No monitors detected."
+    return
+  fi
+
+  if [[ "$state" == "discharging" ]]; then
+    echo "Power: Discharging. Setting still wallpapers."
+    # Ensure awww-daemon is running
+    if ! pgrep -u "$USER_ID" -x awww-daemon >/dev/null; then
+      awww-daemon &
+      sleep 0.5 # Brief pause to allow daemon to initialize
+    fi
+    for m in "${monitors[@]}"; do
+      local img
+      img=$(get_random_still)
+      hyprctl dispatch "hl.dsp.exec_cmd([[ awww img --transition-type random --outputs \"$m\" \"$img\" ]])"
     done
+    # Overlap to avoid black screen gap, then kill the other daemon
+    (sleep 2 && pkill -u "$USER_ID" -"$CLEANUP_SIGNAL" mpvpaper) &
+  else
+    echo "Power: $state. Setting video wallpapers."
+    for m in "${monitors[@]}"; do
+      local socket="/tmp/mpv-socket-${m}"
+      # Using the user's mpvpaper flags with unique sockets per monitor
+      hyprctl dispatch "hl.dsp.exec_cmd([[ mpvpaper -spf -n 1200 -o '--ao=null --reset-on-next-file=loop --loop-playlist --shuffle --panscan=1 --hwdec=auto input-ipc-server=$socket' \"$m\" \"$VIDEOS_DIR\" ]])"
+    done
+    (sleep 2 && pkill -u "$USER_ID" -"$CLEANUP_SIGNAL" awww-daemon) &
+  fi
 }
 
-#perform cleanup and exit
-trap 'cleanup && exit' exit 1 3 15
+# Check if required processes are running for all monitors
+check_health() {
+  local state="$1"
+  local monitors
+  mapfile -t monitors < <(get_monitors)
+  local expected_count=${#monitors[@]}
 
-laststate="start"
-bat=$(ls /sys/class/power_supply | grep -m 1 "BAT")
-wptoggle "$(cat /sys/class/power_supply/$bat/status)"
-sleep 5
-while pgrep Hyprland >> /dev/null; do
-    wptoggle "$(cat /sys/class/power_supply/$bat/status)"
-    sleep 5
+  if [[ $expected_count -eq 0 ]]; then return 0; fi
+
+  local current_count
+  if [[ "$state" == "discharging" ]]; then
+    current_count=$(pgrep -u "$USER_ID" -x awww-daemon | wc -l)
+    expected_count=1 # awww uses a single daemon for all monitors
+  else
+    current_count=$(pgrep -u "$USER_ID" -x mpvpaper | wc -l)
+  fi
+
+  [[ "$current_count" -ge "$expected_count" ]]
+}
+
+# Cleanup on exit
+cleanup() {
+  echo "Exiting and cleaning up..."
+  # Disable the trap to prevent recursion
+  trap - EXIT
+  stop_wallpapers
+  rm -f "$LOCK_FILE"
+}
+
+# Singleton Pattern / Instance Management
+if [[ -f "$LOCK_FILE" ]]; then
+  old_pid=$(cat "$LOCK_FILE" 2>/dev/null || echo "")
+  if [[ -n "$old_pid" ]] && kill -0 "$old_pid" 2>/dev/null; then
+    echo "Another instance is running (PID: $old_pid). Terminating it."
+    kill -15 "$old_pid" || kill -9 "$old_pid"
+    sleep 1
+  fi
+fi
+echo "$$" >"$LOCK_FILE"
+
+# Set up traps: EXIT for cleanup, others to trigger exit
+trap cleanup EXIT
+trap "exit 0" SIGINT SIGTERM SIGQUIT SIGHUP
+
+last_state="none"
+
+echo "Wallpaper manager started (PID: $$)."
+echo "Stills: $STILLS_DIR"
+echo "Videos: $VIDEOS_DIR"
+
+# --- Main Loop ---
+while true; do
+  # Exit if Hyprland session is no longer active
+  if ! pgrep -u "$USER_ID" -x Hyprland >/dev/null; then
+    echo "Hyprland session ended. Exiting."
+    exit 0
+  fi
+
+  if [[ "$FORCE_MODE" == "stills" ]]; then
+    current_state="discharging"
+  elif [[ "$FORCE_MODE" == "videos" ]]; then
+    current_state="charging"
+  else
+    current_state=$(get_power_status)
+  fi
+
+  should_apply=false
+  if [[ "$current_state" != "$last_state" ]]; then
+    should_apply=true
+  elif ! check_health "$current_state"; then
+    echo "Health check failed (wallpaper process missing). Re-applying..."
+    should_apply=true
+  fi
+
+  if [[ "$should_apply" == "true" ]]; then
+    apply_wallpaper "$current_state"
+    last_state="$current_state"
+    # Small grace period for processes to initialize before next health check
+    sleep 3 &
+    wait $!
+  fi
+
+  # Use sleep in background and wait for it to be interruptible by signals
+  sleep "$POLL_INTERVAL" &
+  wait $!
 done

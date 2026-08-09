@@ -268,7 +268,7 @@
     ))
 (defwindow bar0
     :monitor 0
-    :exclusive false
+    :exclusive true
     :geometry (geometry 
         :x "15px"
         :y "0px"
